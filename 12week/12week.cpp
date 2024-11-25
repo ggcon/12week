@@ -81,7 +81,7 @@ vec3 Mul(vec3 a, Matrix3x3 b) {
 // 화면 초기화
 void clearScreenBuffer() {
     for (int i = 0; i < WIDTH * HEIGHT * 2; i++) {
-        screenBuffer[i] = ' ';
+        screenBuffer[i] = ' '; // 모든 버퍼를 공백으로 초기화
     }
     //커서 숨기기
     CONSOLE_CURSOR_INFO cursorInfo;
@@ -92,14 +92,12 @@ void clearScreenBuffer() {
 
 // 스크린 버퍼에 텍스트 기록
 void writeToBuffer(int x, int y, const char* text) {
-    
-    int len = strlen(text);
-
+    int len = strlen(text); // 문자열 길이 확인
     for (int i = 0; i < len; i++) {
-        int index = (y * WIDTH + x + i) * 2;
-        if (index >= 0 && index < WIDTH * HEIGHT * 2) {
-            screenBuffer[index] = text[i];
-            screenBuffer[index + 1] = text[i]; // 두 칸으로 같은 문자 삽입
+        int index = (y * WIDTH + x + i) * 2; // 스크린 버퍼 인덱스 계산
+        if (index >= 0 && index < WIDTH * HEIGHT * 2) { // 범위 내 확인
+            screenBuffer[index] = text[i]; // 첫 번째 문자 삽입
+            screenBuffer[index + 1] = text[i]; // 두 번째 문자 삽입
         }
     }
 }
@@ -121,19 +119,19 @@ void Draw() {
 
 // 태양 그리기 (삼각형)
 void drawSun(float angle) {
-    vec3 vertices[3] = {
+    vec3 vertices[3] = { // 삼각형 꼭짓점 정의
         {0.0f, -5.0f, 1.0f},
         {-4.33f, 2.5f, 1.0f},
         {4.33f, 2.5f, 1.0f}
     };
 
-    Matrix3x3 rotation = createRotationMatrix(angle);
+    Matrix3x3 rotation = createRotationMatrix(angle); // 회전 행렬 생성
 
     for (int i = 0; i < 3; i++) {
-        vec3 rotatedVertex = Mul(vertices[i], rotation);
-        rotatedVertex.x += sun.x;
+        vec3 rotatedVertex = Mul(vertices[i], rotation); // 회전 적용
+        rotatedVertex.x += sun.x; // 태양 중심으로 이동
         rotatedVertex.y += sun.y;
-        writeToBuffer((int)(rotatedVertex.x), (int)(rotatedVertex.y), "S");
+        writeToBuffer((int)(rotatedVertex.x), (int)(rotatedVertex.y), "S"); // 버퍼에 출력
     }
 }
 
@@ -152,13 +150,13 @@ void drawEarth(float angle) {
         {-1.0f, 1.0f, 1.0f}    // 왼쪽 위
     };
 
-    Matrix3x3 rotation = createRotationMatrix(angle);
+    Matrix3x3 rotation = createRotationMatrix(angle); // 회전 행렬 생성
 
     for (int i = 0; i < 4; i++) {
-        vec3 rotatedVertex = Mul(vertices[i], rotation);
-        rotatedVertex.x += earthOrbit.x;
+        vec3 rotatedVertex = Mul(vertices[i], rotation); // 회전 적용
+        rotatedVertex.x += earthOrbit.x; // 중심 이동
         rotatedVertex.y += earthOrbit.y;
-        writeToBuffer((int)(rotatedVertex.x), (int)(rotatedVertex.y), "E");
+        writeToBuffer((int)(rotatedVertex.x), (int)(rotatedVertex.y), "E"); // 버퍼에 기록
     }
 }
 
@@ -231,7 +229,7 @@ int main() {
         
         else if (phase == 1) {
             clearScreenBuffer();
-            drawScene(0, 0, 0);
+            drawScene(0, 0, 0); // 행성의 초기 위치 출력
             Draw();
         }
         else if (phase == 2) {
@@ -242,7 +240,7 @@ int main() {
             moonAngle += MOON_ORBIT_SPEED * 100;
         }
 
-        Sleep(100);
+        Sleep(100); // 100ms 대기 (프레임 제한)
     }
 
     return 0;
