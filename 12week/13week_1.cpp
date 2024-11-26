@@ -1,48 +1,46 @@
 //1번 문제
 //게임 루프
 //화면은 60프레임
+//입력도 그에 맞춰서
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
 #include <windows.h>
 
-//초기화 함수
-void Init() {
-	system("cls");
-	printf("초기화"\n);
-}
-
-//렌더링 함수
-void Render() {
-	printf("렌더링\n");
-}
-
-//업데이트 함수(키 입력을 받음)
 void Update() {
-	if (_kbhit()) {
-		char key = _getch();
-		printf("키 입력 : %c/n", key);
-
-		if (key == 'q') {
-			printf("종료\n");
-			exit(0);
-		}
-	}
+    if (_kbhit()) {
+        char key = _getch();
+        if (key == 27) { // ESC 키
+            printf("종료\n");
+            exit(0);
+        }
+    }
 }
 
-//게임루프 함수
+void Render() {
+    system("cls");
+    printf("렌더링 중...\n");
+}
+
 void GameLoop() {
-	Init();
-	while (1) {
-		Update();
-		Render();
-		//Sleep(1000 / 60); 이거 없으면 cpu 불탐
-	}
+    const int fps = 60;
+    const DWORD frameTime = 1000 / fps; // 한 프레임당 시간 (밀리초 단위)
+
+    while (1) {
+        DWORD start = GetTickCount(); // 현재 시간(ms)
+
+        Update();  // 입력 처리
+        Render();  // 화면 출력
+
+        DWORD elapsed = GetTickCount() - start; // 프레임 처리 시간 계산
+        if (elapsed < frameTime) {
+            Sleep(frameTime - elapsed); // 남은 시간만큼 대기
+        }
+    }
 }
 
-//메인 함수
-int main () {
-	GameLoop();
-	return 0;
+int main() {
+    GameLoop();
+    return 0;
 }

@@ -7,9 +7,9 @@
 #define WIDTH 40
 #define HEIGHT 24
 
-char screenBuffer[WIDTH * HEIGHT * 2 + 1]; // +1은 null 문자용
+char screenBuffer[WIDTH * HEIGHT * 2]; 
 
-void Init() {
+void clearScreenBuffer() {
     // 버퍼 초기화
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
@@ -17,18 +17,20 @@ void Init() {
             screenBuffer[(i * WIDTH + j) * 2 + 1] = ' '; // 두 번째 char: 공백
         }
     }
-    screenBuffer[WIDTH * HEIGHT * 2] = '\0'; // 문자열 끝 표시
-
-    // "렌더링..." 문구 추가
-    const char* message = "렌더링...";
-    for (int i = 0; message[i] != '\0'; i++) {
-        screenBuffer[i * 2] = message[i];
-        screenBuffer[i * 2 + 1] = ' '; // 두 번째 char도 공백으로
-    }
 }
 
 void Render() {
-    printf("%s\n", screenBuffer);
+    COORD coord = { 0, 0 };  // (0, 0) 좌표로 커서 이동
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+
+    for (int y = 0; y < HEIGHT; y++) {
+        for (int x = 0; x < WIDTH; x++) {
+            int index = (y * WIDTH + x) * 2;  // 픽셀당 2문자
+            putchar(screenBuffer[index]);    // 첫 번째 문자
+            putchar(screenBuffer[index + 1]); // 두 번째 문자
+        }
+        putchar('\n');  // 한 줄 끝
+    }
 }
 
 void Update() {
@@ -36,7 +38,7 @@ void Update() {
 }
 
 void GameLoop() {
-    Init();
+    clearScreenBuffer();
     Render(); // 한 번만 렌더링하여 화면에 표시
 
     while (1) {
