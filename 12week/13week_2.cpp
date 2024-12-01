@@ -33,9 +33,10 @@ void Update() {
     }
 }
 
-//게임루프 함수// 교수님 쳌 //게임루프만 구현해라
+//게임루프 함수// 교수님 쳌 
 void GameLoop() {
     Init();
+
 
     clock_t lastTime = clock(); // 이전 프레임 시간 기록
     int fps = 60;               // 목표 FPS

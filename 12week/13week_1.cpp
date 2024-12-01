@@ -8,6 +8,7 @@
 #include <conio.h>
 #include <windows.h>
 
+//업데이트 함수
 void Update() {
     if (_kbhit()) {
         char key = _getch();
@@ -18,12 +19,14 @@ void Update() {
     }
 }
 
+//렌더링 함수
 void Render() {
     system("cls");
     printf("렌더링 중...\n");
 }
 
-void GameLoop() {
+//게임루프 함수
+void GameLoop() { //게임루프만 구현해라
     const int fps = 60;
     const DWORD frameTime = 1000 / fps; // 한 프레임당 시간 (밀리초 단위)
 

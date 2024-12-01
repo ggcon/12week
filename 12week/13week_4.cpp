@@ -1,64 +1,72 @@
-//3관절
-//1번 관절 3a배
-//2번 관절 2a배,
-//3번 관절 a배
-//끝부분에 주먹
-//관절은 겹침(1픽셀씩)
-//길이 1 정의는 3픽셀
-//15도 75도 꺾여있다.
-//좌표를 구하라(주먹만 그려랴)
-// 
-//369관절 
-
-//40 x 24 스크린버퍼
-
-//1번 문제
-//게임 루프
-//화면은 60프레임
-
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
-#include <time.h>
-#include <conio.h>
 #include <windows.h>
+#include "matrix.h"
 
-void Initialize() {
-	system("cls");
-	printf("초기화...\n");
+#define WIDTH 40
+#define HEIGHT 24
+#define M_PI 3.14159265358979323846
+
+char screenBuffer[WIDTH * HEIGHT * 2 + 1]; // null 문자를 위해 +1 추가
+
+// 스크린 버퍼 초기화
+void bufferClear() {
+    for (int i = 0; i < WIDTH * HEIGHT * 2; i++) {
+        screenBuffer[i] = ' '; // 초기값은 공백 문자로 채움
+    }
+    screenBuffer[WIDTH * HEIGHT * 2] = '\0'; // 문자열 끝을 null로 설정
+
+    // 커서 숨기기
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+    cursorInfo.bVisible = FALSE;  // 커서를 숨김
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
 }
 
-void Render() {
-	
+// 화면 출력
+void bufferDraw() {
+    COORD coord = { 0, 0 };  // 콘솔 커서를 (0, 0)으로 이동
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    printf("%s", screenBuffer);
 }
 
-void Update() {
-	if (_kbhit()) {
-		char key = _getch();
-		printf("키 입력 : %c\n", key);
+// 원을 그리는 함수
+void drawCircle(int centerX, int centerY, int radius) {
+    // 각도를 0도부터 360도까지 변화시킴
+    for (int angle = 0; angle < 360; angle++) {
+        // 라디안으로 변환
+        float radian = angle * (M_PI / 180.0f);
 
-		if (key == 'q') {
-			printf("종료\n");
-			exit(0);
-		}
-	}
+        // 원의 좌표 계산
+        int x = centerX + (int)(radius * cosf(radian));
+        int y = centerY + (int)(radius * sinf(radian));
+
+        // 화면 버퍼에 점 찍기
+        if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+            int index = (y * WIDTH + x) * 2;
+            screenBuffer[index] = '*';
+            screenBuffer[index + 1] = ' '; // 두 번째 문자: 공백
+        }
+    }
 }
 
+// 게임 루프
 void GameLoop() {
-	Initialize();
+    bufferClear();          // 버퍼 초기화
 
-	clock_t start_time = clock(); // 현재 시간을 기록
-	while (1) {
-		Update(); // Update는 계속 호출하여 키 입력을 처리
-		// 현재 시간과 시작 시간의 차이를 확인하여 1초마다 렌더링
-		if ((clock() - start_time) >= CLOCKS_PER_SEC) { // CLOCKS_PER_SEC는 1초
-			Render();
-			start_time = clock(); // 시간을 초기화하여 다음 1초를 기다림
-		}
-	}
+    // 반지름 10인 원을 (20, 12) 위치에 그리기
+    drawCircle(20, 12, 10);     // 원의 중심 (20, 12), 반지름 10
+
+    while (1) {
+        bufferDraw();                 // 버퍼 렌더링
+        Sleep(1000 / 60);         // 60FPS 유지
+    }
 }
-
 
 int main() {
-	GameLoop();
-	return 0;
+    SetConsoleOutputCP(CP_UTF8);
+
+    GameLoop();
+    return 0;
 }
